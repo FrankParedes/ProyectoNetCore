@@ -1,0 +1,126 @@
+﻿@model ProyectoNETCORE.Models.Trabajadores
+
+<div class="modal fade" id="addTrabajador">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="">Nuevo Trabajador</h4>
+            </div>
+            <form method="post" asp-action="Insertar">
+            <div class="modal-body">
+                
+                    <div class="form-group">
+                        <label asp-for="TipoDocumento" class="control-label"></label>
+                        <select asp-for="TipoDocumento" class="form-control" id="Tipodoc" required>
+                            <option value="">--Seleccione--</option>
+                            <option value="DNI">DNI</option>
+                            <option value="PSP">PASAPORTE</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="NumeroDocumento" class="control-label"></label>
+                        <input asp-for="NumeroDocumento" class="form-control" autocomplete="off" onkeypress="return valideKey(event);" required />
+                        <span asp-validation-for="NumeroDocumento"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Nombres" class="control-label"></label>
+                        <input asp-for="Nombres" class="form-control" autocomplete="off" required />
+                        <span asp-validation-for="Nombres" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Sexo" class="control-label"></label><br />
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" asp-for="Sexo" type="radio" id="inlineRadio1" value="M" required>
+                            <label class="form-check-label" for="inlineRadio1">Masculino</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" asp-for="Sexo" type="radio" id="inlineRadio2" value="F" required>
+                            <label class="form-check-label" for="inlineRadio2">Femenino</label>
+                        </div>
+                        <span asp-validation-for="Sexo" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="IdDepartamentoNavigation.NombreDepartamento" class="control-label"></label>
+                        <select asp-for="IdDepartamento" class="form-control" asp-items="@ViewBag.Departamentos" required>
+                            <option value="">--Seleccione--</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="IdProvinciaNavigation.NombreProvincia" class="control-label"></label>
+                        <select asp-for="IdProvincia" class="form-control" required>
+                            <option value="">--Seleccione--</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="IdDistritoNavigation.NombreDistrito" class="control-label"></label>
+                        <select asp-for="IdDistrito" class="form-control" required>
+                            <option value="">--Seleccione--</option>
+                        </select>
+                    </div>
+                
+            </div>
+
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-success" data-bs-save="modal">Guardar</button>
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Cerrar</button>                
+            </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="~/lib/bootstrap/dist/js/bootstrap.js"></script>
+<script src="~/js/site.js" asp-append-version="true"></script>
+<script>
+    $("#IdDepartamento").change(function () {
+        $.ajax({
+            type: "POST",
+            url: "/Trabajador/LlenarProvJSON",
+            data: { iddepat: $('#IdDepartamento').val() },
+            success: function (response) {
+                var items = '<option value="">--Seleccione--</option>';
+                $(response).each(function () {
+                    items += "<option value=" + this.value + ">" + this.text + "</option>";
+                })
+                $("#IdProvincia").html(items);
+            }
+        });
+        var opciones = '<option value="">--Seleccione--</option>';
+        $("#IdProvincia").html(opciones);
+        $("#IdDistrito").html(opciones);
+    });
+
+    $("#IdProvincia").change(function () {
+        $.ajax({
+            type: "POST",
+            url: "/Trabajador/LlenarDisJSON",
+            data: { iddis: $('#IdProvincia').val() },
+            success: function (response) {
+                var items = '<option value="">--Seleccione--</option>';
+                $(response).each(function () {
+                    items += "<option value=" + this.value + ">" + this.text + "</option>";
+                })
+                $("#IdDistrito").html(items);
+            }
+        });
+        var opciones = '<option value="">--Seleccione--</option>';
+        $("#IdDistrito").html(opciones);
+    });
+
+    function valideKey(evt) {
+
+        // code is the decimal ASCII representation of the pressed key.
+        var code = (evt.which) ? evt.which : evt.keyCode;
+
+        if (code == 8) { // backspace.
+            return true;
+        } else if (code >= 48 && code <= 57) { // is a number.
+            return true;
+        } else { // other keys.
+            return false;
+        }
+    }
+</script>
+

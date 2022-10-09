@@ -1,0 +1,178 @@
+﻿@model IEnumerable<ProyectoNETCORE.Models.Trabajadores>
+
+@{
+    ViewData["Title"] = "lstTrabajador";
+}
+
+<h1>Lista de Trabajadores</h1>
+<br />
+@if (@ViewBag.mensaje != null)
+{
+    if (@ViewBag.identificador == 1)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @ViewBag.mensaje
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    else if (@ViewBag.identificador == 2)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @ViewBag.mensaje
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+}
+<br />
+
+<div id="PlaceHolderHere"></div>
+
+    <!--<a class="btn btn-dark" asp-action="Insertar">Nuevo Trabajador</a>-->
+<div class="row">
+    <div class="col-md-2">
+        <button type="button" class="btn btn-dark" data-toggle="modal" data-target="#addTrabajador" data-url="@Url.Action("Insertar")">Nuevo Trabajador</button>
+    </div>
+    <div class="col-md-5">  
+        <form asp-action="lstTrabajador">
+            <div class="row">
+                <div class="col-md-2" style="text-align:right;">
+                    <label>Sexo:</label>
+                </div>
+                <div class="col-md-5">
+                    <select class="form-control" name="sexo">
+                        <option value="">--Seleccione--</option>
+                        <option value="M">Masculino</option>
+                        <option value="F">Femenino</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <input type="submit" value="Buscar" class="btn btn-dark" />
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+
+
+        
+<br />
+<br />
+<table class="table table-hover table-bordered">
+    <thead class="table-dark">
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.TipoDocumento)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.NumeroDocumento)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Nombres)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Sexo)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.IdDepartamentoNavigation.NombreDepartamento)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.IdProvinciaNavigation.NombreProvincia)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.IdDistritoNavigation.NombreDistrito)
+            </th>            
+            <th style="text-align:center;">
+                <label>Acción</label>
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var item in Model) {
+        string clase;
+        if(item.Sexo=="M"){
+            clase = "table-primary";
+        }else{
+            clase = "table-warning";
+        }
+        <tr class="@clase">
+            <td>
+                @Html.DisplayFor(modelItem => item.TipoDocumento)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.NumeroDocumento)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Nombres)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Sexo)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.IdDepartamentoNavigation.NombreDepartamento)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.IdProvinciaNavigation.NombreProvincia)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.IdDistritoNavigation.NombreDistrito)
+            </td>
+            <td style="text-align:center;">
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#updateTrabajador"
+                data-url="@Url.Action($"Actualizar/{item.Id}")">
+                    Editar
+                </button>
+                <button type="button" id="openmodal" class="btn btn-danger" data-bs-toggle="modal" 
+                data-bs-target="#myModalEliminar" data-id="@item.Id">
+                    Eliminar
+                </button>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>
+
+
+<div class="modal fade" id="myModalEliminar" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="simpleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" role="form" asp-action="Eliminar">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalLabel">Eliminar Trabajador</h4>
+                </div>
+                <div class="modal-body">
+                    <p>Esta seguro de que desea eliminar el trabajador?</p>
+                    <input type="hidden" name="IdTrabajador" id="IdTrabajador" value="" />
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-raised btn-warning">Eliminar</button>
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="~/lib/bootstrap/dist/js/bootstrap.js"></script>
+<script src="~/js/site.js" asp-append-version="true"></script>
+<script>
+    $(function () {
+        var PlaceHolderHereElement = $('#PlaceHolderHere');
+        $('button[data-toggle="modal"]').click(function (event) {
+
+            var url = $(this).data('url');
+            var decodeUrl = decodeURIComponent(url);
+            $.get(decodeUrl).done(function (data) {
+                PlaceHolderHereElement.html(data);
+                PlaceHolderHereElement.find('.modal').modal('show');
+            })
+        });
+    })
+
+    $(document).on("click", "#openmodal", function () {
+        var myBookId = $(this).data('id');
+        $(".modal-body #IdTrabajador").val(myBookId);
+    });
+</script>
